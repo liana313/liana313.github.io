@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="Liana Patel">
+  <title>LOTUSPlan: LLM-Based Data Programming — Liana Patel</title>
+  <link rel="stylesheet" type="text/css" href="../stylesheet.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prism-themes@1.9.0/themes/prism-one-light.min.css">
+  <style>
+    body { background: #f0f1f3; margin: 0; }
+    .page-with-toc {
+      display: flex;
+      gap: 2rem;
+      align-items: flex-start;
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 2.5% 3%;
+      box-sizing: border-box;
+    }
+    .blog-toc {
+      flex: 0 0 220px;
+      position: sticky;
+      top: 1rem;
+      align-self: flex-start;
+      max-height: calc(100vh - 2rem);
+      overflow-y: auto;
+      padding: 14px 14px 16px;
+      background: #fff;
+      border: 1px solid #e4e4e7;
+      border-radius: 10px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+      box-sizing: border-box;
+    }
+    .toc-nav .toc-heading {
+      margin: 0 0 0.75em;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #555;
+      font-family: 'Lato', Verdana, Helvetica, sans-serif;
+    }
+    .toc-list,
+    .toc-list ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .toc-list ul {
+      margin-top: 0.25em;
+      margin-bottom: 0.35em;
+      padding-left: 0.85rem;
+      border-left: 1px solid #e8e8e8;
+    }
+    .toc-list a {
+      display: block;
+      padding: 3px 0;
+      line-height: 1.35;
+      font-size: 13px;
+      color: #1772d0;
+      text-decoration: none;
+    }
+    .toc-list a:hover,
+    .toc-list a:focus {
+      color: #f09228;
+    }
+    .blog-main {
+      flex: 1 1 0;
+      min-width: 0;
+      max-width: 920px;
+    }
+    .blog-wrap {
+      max-width: none;
+      margin: 0;
+      padding: 2rem 2.25rem 2.75rem;
+      background: #fff;
+      border: 1px solid #e4e4e7;
+      border-radius: 10px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.04);
+      box-sizing: border-box;
+    }
+    .blog-wrap .name {
+      font-size: 26px;
+      text-align: left;
+      padding-top: 0;
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+      color: #111;
+    }
+    .blog-meta { color: #5a5a5f; margin-bottom: 1.25em; font-size: 13px; line-height: 1.45; }
+    .blog-article > h2 {
+      margin-top: 2.1em;
+      margin-bottom: 0.65em;
+      padding-bottom: 0.4em;
+      border-bottom: 1px solid #e8e8ec;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      color: #1a1a1c;
+      scroll-margin-top: 1.25rem;
+    }
+    .blog-article > h2:first-of-type { margin-top: 1.1em; }
+    .blog-article > h3 {
+      margin-top: 1.6em;
+      margin-bottom: 0.45em;
+      font-size: 15px;
+      font-weight: 700;
+      color: #222;
+      scroll-margin-top: 1.25rem;
+    }
+    .blog-article > h4 {
+      margin-top: 1.15em;
+      margin-bottom: 0.35em;
+      font-size: 14px;
+      font-weight: 700;
+      color: #333;
+      scroll-margin-top: 1.25rem;
+    }
+    .blog-article p, .blog-article li { line-height: 1.6; margin: 0.7em 0; color: #2d2d32; }
+    .blog-article ul { padding-left: 1.35em; }
+    .blog-article ul.intro-apps {
+      margin: 0.4em 0 1.1em;
+      padding-left: 1.1em;
+      list-style: none;
+    }
+    .blog-article ul.intro-apps li {
+      margin: 0.18em 0;
+      padding-left: 0.35em;
+    }
+    .blog-article ul.intro-apps li::before {
+      content: "›";
+      margin-right: 0.55em;
+      color: #1772d0;
+      font-weight: 700;
+    }
+    .resource-links {
+      display: grid;
+      grid-template-columns: minmax(5.5rem, auto) 1fr;
+      gap: 0.4rem 1.1rem;
+      font-size: 13px;
+      margin: 0.25em 0 1.25em;
+      align-items: baseline;
+    }
+    .resource-links dt {
+      margin: 0;
+      font-weight: 700;
+      color: #444;
+    }
+    .resource-links dd { margin: 0; word-break: break-word; }
+    .blog-figure {
+      margin: 1.35em 0 1.5em;
+      border: 1px solid #e2e2e6;
+      border-radius: 8px;
+      background: #fafafa;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+    .blog-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      vertical-align: middle;
+    }
+    .blog-figure figcaption {
+      margin: 0;
+      padding: 10px 14px 12px;
+      font-size: 12px;
+      line-height: 1.45;
+      color: #555;
+      background: #fff;
+      border-top: 1px solid #ececee;
+    }
+    .code-block-wrap {
+      position: relative;
+      margin: 1em 0;
+    }
+    .blog-article .code-block-wrap pre {
+      margin: 0;
+      padding: 2.5rem 16px 14px 16px;
+      overflow-x: auto;
+      border-radius: 6px;
+      border: 1px solid #e1e4e8;
+      background: #fafafa !important;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      -webkit-user-select: text;
+      user-select: text;
+      cursor: text;
+    }
+    .blog-article pre code[class*="language-"] {
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.55;
+      -webkit-user-select: text;
+      user-select: text;
+      background: transparent !important;
+      text-shadow: none !important;
+      padding: 0 !important;
+      border-radius: 0 !important;
+    }
+    .blog-article :not(pre) > code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.9em;
+      background: #f0f2f5;
+      border: 1px solid #e4e6ea;
+      border-radius: 4px;
+      padding: 0.12em 0.4em;
+      color: #242428;
+    }
+    .code-copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      z-index: 1;
+      font-family: 'Lato', Verdana, Helvetica, sans-serif;
+      font-size: 12px;
+      padding: 4px 10px;
+      border: 1px solid #c8d6e8;
+      border-radius: 4px;
+      background: #fff;
+      color: #1772d0;
+      cursor: pointer;
+      line-height: 1.3;
+    }
+    .code-copy-btn:hover,
+    .code-copy-btn:focus {
+      color: #f09228;
+      border-color: #f09228;
+      outline: none;
+    }
+    .code-copy-btn:focus-visible {
+      box-shadow: 0 0 0 2px rgba(23, 114, 208, 0.35);
+    }
+    .code-copy-btn.copied {
+      color: #0d6b3c;
+      border-color: #8fd4a8;
+    }
+    .blog-article .table-wrap { overflow-x: auto; margin: 1.1em 0; border: 1px solid #e8e8ec; border-radius: 6px; }
+    .blog-article table { border-collapse: collapse; width: 100%; margin: 0; font-size: 12px; }
+    .blog-article th, .blog-article td { border: 1px solid #e8e8ec; padding: 8px 10px; vertical-align: top; }
+    .blog-article th { background: #f4f4f6; text-align: left; font-weight: 700; color: #333; }
+    .blog-article table.example-table { min-width: 700px; }
+    .blog-article table.example-table caption {
+      caption-side: bottom;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 400;
+      color: #5c5c62;
+      line-height: 1.4;
+      padding: 8px 4px 2px;
+    }
+    .blog-article table.example-table td,
+    .blog-article table.example-table th {
+      word-wrap: break-word;
+      hyphens: auto;
+    }
+    .blog-article table.example-table td.num {
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      width: 3.5rem;
+    }
+    .blog-article table.example-table td.mono code {
+      display: block;
+      font-size: 10px;
+      line-height: 1.4;
+      word-break: break-word;
+      white-space: normal;
+      color: #333;
+    }
+    .key-results {
+      margin: 1.35em 0;
+      padding: 0;
+      border-radius: 8px;
+      border: 1px solid #e2e4ea;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+      overflow: hidden;
+    }
+    .key-results-inner {
+      padding: 14px 16px 15px;
+      border-left: 3px solid #f09228;
+      background: linear-gradient(180deg, #fffbf5 0%, #fff 100%);
+    }
+    .key-results-label {
+      display: block;
+      margin: 0 0 0.5rem;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #9a5b0a;
+      font-family: 'Lato', Verdana, Helvetica, sans-serif;
+    }
+    .blog-article .key-results-body {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.55;
+      color: #242428;
+    }
+    .back { margin-bottom: 1.25em; }
+    .blog-title-row {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      margin: 0 0 1.5em;
+      padding-bottom: 1.25em;
+      border-bottom: 1px solid #ececee;
+    }
+    .blog-title-row .blog-logo-wrap {
+      flex: 0 0 auto;
+      margin: 0;
+      text-align: center;
+    }
+    .blog-title-row .blog-logo-wrap img {
+      max-width: 100px;
+      width: 100px;
+      height: auto;
+      display: block;
+    }
+    .blog-title-row .blog-title-text { flex: 1 1 auto; min-width: 0; }
+    .blog-title-row .name { margin: 0 0 0.35em; }
+    .blog-title-row .blog-meta { margin: 0; }
+    @media (max-width: 520px) {
+      .blog-title-row { flex-direction: column; align-items: flex-start; text-align: left; }
+      .blog-title-row .blog-logo-wrap img { max-width: 88px; width: 88px; }
+    }
+    @media (max-width: 900px) {
+      .page-with-toc {
+        flex-direction: column;
+        gap: 1.25rem;
+        padding: 4% 4%;
+      }
+      .blog-toc {
+        position: static;
+        flex: none;
+        width: 100%;
+        max-height: none;
+        overflow: visible;
+        padding: 12px 14px 14px;
+        background: #fff;
+        box-sizing: border-box;
+      }
+      .blog-wrap { padding: 1.35rem 1.1rem 2rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-with-toc">
+    <aside class="blog-toc" aria-label="Table of contents">
+      <nav class="toc-nav" aria-labelledby="toc-heading">
+        <p class="toc-heading" id="toc-heading">On this page</p>
+        <ul class="toc-list">
+          <li><a href="#links">Links</a></li>
+          <li><a href="#background">Background</a></li>
+          <li><a href="#semantic-operators-intro">Semantic operators example</a></li>
+          <li><a href="#lotusplan-api">The LOTUSPlan API</a></li>
+          <li><a href="#lazy-execution">Lazy execution in three steps</a></li>
+          <li>
+            <a href="#exciting-results">Exciting results</a>
+            <ul>
+              <li><a href="#agent-trace-analysis">Agent trace analysis</a></li>
+              <li><a href="#llm-judge-evals">LLM-judge evaluations</a></li>
+              <li><a href="#rag">RAG</a></li>
+              <!-- <li> -->
+                <!-- <a href="#sneak-peek">DeepResearch &amp; document extraction</a> -->
+                <!-- <ul> -->
+                  <li><a href="#deepresearch-agents">DeepResearch agents</a></li>
+                  <li><a href="#document-extraction">Document extraction</a></li>
+                <!-- </ul> -->
+              <!-- </li> -->
+            </ul>
+          </li>
+          <li><a href="#get-started">Get started</a></li>
+          <li><a href="#references">References</a></li>
+        </ul>
+      </nav>
+    </aside>
+    <div class="blog-main">
+  <div class="blog-wrap">
+    <p class="back"><a href="../index.html">← Back to home</a></p>
+
+    <header class="blog-title-row">
+      <div class="blog-logo-wrap">
+        <img src="../images/lotus-logo.png" alt="LOTUS" width="100">
+      </div>
+      <div class="blog-title-text">
+        <p class="name">LOTUSPlan: A Query Optimizer for More Accurate and Cheaper LLM-Powered Data Processing</p>
+        <p class="blog-meta">Liana Patel, Harshit Gupta, Ion Stoica, Carlos Guestrin, Matei Zaharia & The LOTUS Team</p>
+        <p class="blog-meta">June 9, 2026</p>
+      </div>
+    </header>
+
+    <article class="blog-article">
+      <h2 id="links">Links</h2>
+      <dl class="resource-links">
+        <dt>Repo</dt>
+        <dd><a href="https://github.com/lotus-data/lotus">github.com/lotus-data/lotus</a></dd>
+        <dt>Benchmarks</dt>
+        <dd><a href="https://github.com/lotus-data/lotus/tree/main/benchmarks">lotus-data/lotus/benchmarks</a></dd>
+        <dt>Paper Reference</dt>
+        <dd><a href="https://arxiv.org/abs/2407.11418">Semantic operators (arXiv:2407.11418)</a></dd>
+        <dt>Discord</dt>
+        <dd><a href="https://discord.gg/ZWQBurm5bt">LOTUS community</a></dd>
+      </dl>
+
+      <p>We’re excited to share our release of <strong>LOTUSPlan</strong>, LOTUS’ new API for optimized LLM-based data processing via lazy execution of semantic operator programs.</p>
+      <p>Over a year ago LOTUS introduced <em>semantic operators</em>, a declarative programming model for LLM-based data programming. <strong>LOTUSPlan represents the next evolution of the LOTUS API</strong>
+        toward making LLM-based data processing easier, cheaper, and more accurate. LOTUS now builds a global plan of your LLM queries and leverages its suite of optimizers (which now includes your favorite text optimizers like DSPy's <a href="https://gepa-ai.github.io/gepa/">GEPA</a>) to achieve state-of-the-art performance.</p>
+      <p><strong>The results: over 2.4× cost reduction and 4.6× higher accuracy</strong> for LLM-based processing across diverse tasks, like agent trace analysis, LLM-judge evals and RAG.</p>
+
+      <figure class="blog-figure">
+        <img src="figures/hero_summary.png" width="2165" height="878" decoding="async" loading="eager" alt="Summary charts: LOTUSPlan improves accuracy and reduces cost across semantic operator workloads compared to unoptimized baselines.">
+        <figcaption>End-to-end gains from global planning and optimizers (cost and accuracy) on representative LOTUS workloads.</figcaption>
+      </figure>
+
+      <p>In this blog, we’ll take you through what’s new in LOTUS and see the system in action with <strong>very exciting results</strong> on:</p>
+      <ul class="intro-apps">
+        <li><a href="#agent-trace-analysis">Agent trace analysis</a></li>
+        <li><a href="#llm-judge-evals">LLM-judge evals</a></li>
+        <li><a href="#rag">RAG</a></li>
+        <li><a href="#deepresearch-agents">DeepResearch</a></li>
+        <li><a href="#document-extraction">Document extraction</a></li>
+      </ul>
+      <p>LOTUS has been developed at Stanford and UC Berkeley, and it is deployed in DeepScholar’s <a href="https://deep-scholar.vercel.app/">DeepScholar Research Preview</a> since Winter 2025, where it has served over 10K DeepResearch queries and thousands of users within its first 3 months of release. 
+        The LOTUS framework makes processing large datasets with LLMs efficient and accurate, allowing even resource-constrained teams to scale their LLM-based processing pipelines.</p>
+      <p>Visit our GitHub repo and get started with LOTUS here: <a href="https://github.com/lotus-data/lotus">https://github.com/lotus-data/lotus</a>. We’ve also made all <a href="https://github.com/lotus-data/lotus/tree/main/benchmarks">benchmark code</a> available for the community so that folks can build off of this work.</p>
+
+      <h2 id="background">Background: Why LLM-Based Data Processing Needs New Primitives</h2>
+      <p>Over the past few years, we have been seeing a new set of workloads, which require our AI systems to scale over increasingly massive datasets. Whether it’s a DeepResearch agent synthesizing hundreds of papers, a large scale LLM-Judge evaluation, or complex document extraction, these workloads—which we call <em>semantic bulk processing</em>—share a common challenge: they require processing large amounts of data, often in complex parallel or recursive patterns.</p>
+      <p>Over a year ago, our research introduced <a href="https://www.vldb.org/pvldb/vol18/p4171-patel.pdf">semantic operators</a> to serve these tasks. Semantic operators are declarative primitives of LLM-based data processing—each operator implements a transformation over unstructured datasets and can be optimized with accuracy guarantees. Conceptually, we view semantic operators through two complementary lenses:</p>
+      <ul>
+        <li><strong>The evolution of relational operators for AI-powered data processing:</strong> akin to how relational operators in SQL transformed structured data processing by decoupling application logic from the systems
+           underlying storage and execution, semantic operators are the analog for declarative LLM-based data programming.
+            Semantic operators create a huge design space for optimizations (e.g., <a href="https://arxiv.org/abs/2407.11418">1000× speedups</a> in our experiments!), 
+            and these optimizations are performed with accuracy guarantees with respect to well-defined reference algorithms, making their execution behavior robust, similar to traditional query optimizers.</li>
+        <li><strong>A superset of RAG:</strong> Traditional RAG systems are implemented with two key primitives: <code>search()</code> for retrieving relevant context and
+           <code>LM()</code> invocations for summarization. Semantic operators implement these primitives as well as a far richer set of transformations, 
+           allowing you (and more importantly, your agents) to build pipelines that are more expressive and powerful (as we'll see in a bit!).</li>
+      </ul>
+      <p>We’ve been excited to see a lot of early adoption of semantic operators among users, researchers in the community, and within industry—and we think these primitives are going to be essential, especially as we continue to scale the amount of data we’d like our AI systems and agents to digest.</p>
+
+      <h2 id="semantic-operators-intro">Let’s try out semantic operators in LOTUS</h2>
+      <p>If you’re new to LOTUS, here’s a small example to illustrate semantic operators in action. Let’s use LOTUS to filter through our dataset of GitHub issues to find ones that are good for first-time contributors.</p>
+      <p>First let’s do some basic setup. We’ll configure our model and we’ll create a small dataset, which we create as a standard pandas DataFrame with a single column <code>issue_title</code>, listing GitHub-style issues.</p>
+
+<pre><code class="language-python">import pandas as pd
+import lotus
+from lotus.models import LM
+
+# 1. Configure the LM — export your API key before running (e.g. OPENAI_API_KEY)
+lm = LM(model="gpt-4.1-nano")
+lotus.settings.configure(lm=lm)
+
+# 2. Load data — sample GitHub-style issue titles
+issues = pd.DataFrame({
+    "issue_title": [
+        "Fix typo in README",
+        "Add dark mode support to dashboard",
+        "Refactor entire auth system to use OAuth2",
+        "Update copyright year in LICENSE",
+        "Implement distributed transaction support across microservices",
+        "Change button color on settings page",
+        "Migrate database from Postgres 13 to 16 with zero downtime",
+        "Add missing comma in error message",
+        "Build custom query planner to replace third-party dependency",
+        "Bump lodash to fix known CVE",
+        "Support multi-region active-active replication",
+        "Remove unused import in utils.py",
+    ]
+})</code></pre>
+
+      <p>Since we want to perform a language-based filtering operation, we’ll use LOTUS’ <code>sem_filter</code> operator. This is a simple program in LOTUS. When we call <code>sem_filter</code> on our dataset, we pass a natural-language expression (<em>langex</em>) to the operator—for semantic filters, that instruction is written as a predicate that can be logically evaluated with a boolean value. The langex places the dataset attributes (here, <code>issue_title</code>) in curly brackets to specify that we want to pass it as context.</p>
+
+<pre><code class="language-python"># 3. Run LOTUS program — sem_filter
+good_first_issues = issues.sem_filter(
+    "The {issue_title} describes a small, self-contained task that a new open "
+    "source contributor could tackle without deep knowledge of the codebase"
+)</code></pre>
+
+      <p>LOTUS offers an expansive set of semantic operators. Each one takes a natural-language parameter, implements a specific data transformation, and can be optimized in LOTUS with accuracy guarantees with respect to well-defined reference algorithms. Below we highlight some key semantic operators:</p>
+
+      <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Operator</th><th>Purpose</th><th>Parameters</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>sem_filter</code></td><td>Filters a dataset based on a natural language predicate, returning entities that satisfy the predicate.</td><td>Natural language predicate</td></tr>
+          <tr><td><code>sem_map</code></td><td>Projects a dataset based on a natural language instruction, returning an attribute for each entity.</td><td>Natural language projection</td></tr>
+          <tr><td><code>sem_join</code></td><td>Join two datasets according to a natural language predicate.</td><td>Natural language predicate and the table to join with</td></tr>
+          <tr><td><code>sem_agg</code></td><td>Performs a many-to-one aggregation, generating a single answer from multiple entities.</td><td>Natural language aggregator</td></tr>
+          <tr><td><code>sem_topk</code></td><td>Performs a ranking based on the natural language instruction.</td><td>Natural language comparator: how to rank any two inputs</td></tr>
+          <tr><td><code>sem_search</code></td><td>Perform embedding-based semantic search.</td><td>Query and K items to return</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h2 id="lotusplan-api">The LOTUSPlan API</h2>
+      <p>The LOTUSPlan API is a significant evolution of the LOTUS framework designed to make LLM-based data processing more performant and easy through declarative optimization. It bridges the gap between the flexibility of Python and the performance of a compiled query engine.</p>
+      <p>LOTUS now allows you to switch seamlessly between two modes of execution:</p>
+      <ol>
+        <li><strong>Eager execution</strong> is perfect for iterative development, exploratory data analysis, and prototyping multi-step LLM programs. You write a semantic query, and execute it immediately on your data—just like standard pandas.</li>
+        <li><strong>Lazy execution</strong> delivers performance with state-of-the-art optimizers. By wrapping your logic in a LOTUS <code>LazyFrame</code>, you allow LOTUS to see the “whole picture”—under the hood the engine creates an abstract syntax tree (AST) that can be globally optimized before executing your final program.</li>
+      </ol>
+      <p>The new LOTUS LazyFrame module allows you to chain arbitrary semantic operators and pandas operators together, before calling <code>.optimize()</code> and <code>.execute()</code>. Under the hood, LOTUS constructs the AST as soon as you declare your LOTUS pipeline. The AST defines the logical plan for your LLM program, where each semantic operator is represented by a single node, specified by an LLM and natural language prompt used for that operator’s execution.</p>
+      <p>When you call <code>.optimize()</code> over your program, LOTUS can rewrite the AST logic—for example reordering operators, performing prompt optimization, or substituting expensive model calls for cheaper ones using model cascades.</p>
+      <p>We’ve designed LOTUS to modularly support custom optimizers, so that as new ones become available, we can seamlessly support them (let us know what optimizers you’d like us to support next!). In addition to always-on optimizers (e.g., operator reordering), LOTUS currently supports two key custom optimizers:</p>
+      <ul>
+        <li><strong>GEPA optimizer:</strong> GEPA is a state-of-the-art prompt optimizer, which allows you to specify a small labeled dataset and rewrites all prompt instructions to optimize your accuracy metric. LOTUS allows you to leverage GEPA for optimizing any semantic operator.</li>
+        <li><strong>Cascade optimizer:</strong> The cascade optimizer leads to significant cost reduction by routing examples to a cheap proxy model when possible. Crucially, this optimizer provides statistical accuracy guarantees, allowing you to tune your targets (like recall and precision for semantic filters) for your specific application to control cost while maintaining accuracy. Cascades can be used to optimize semantic filters, semantic joins, and pairwise LLM-judges in LOTUS.</li>
+      </ul>
+
+      <h2 id="lazy-execution">Lazy execution in three steps</h2>
+      <p>Earlier, we saw how to write a simple semantic filter program using LOTUS’ eager execution API. Now let’s look at how we can write the same program using the LOTUSPlan API. We can migrate from the eager version of the code in three essential steps.</p>
+      <p>First we define our pipeline, using the <code>LazyFrame()</code> class to wrap our semantic operator program. Using the LOTUS LazyFrame API, you can chain an arbitrary number of semantic operators and traditional pandas operators (e.g., <code>.filter()</code>, <code>.assign()</code>, <code>.head()</code>) to construct your pipeline. Then we call LOTUS’ <code>.optimize()</code> on our pipeline, where we pass our choice of optimizers and training data. Finally, we execute our pipeline with <code>.execute()</code> for fast and accurate LLM-based processing.</p>
+
+<pre><code class="language-python">from lotus.ast import LazyFrame
+from lotus.ast.optimizer import GEPAOptimizer, CascadeOptimizer
+
+# Step 1: Build a LOTUS pipeline — nothing executes yet
+pipeline = LazyFrame().sem_filter(
+    "The {issue_title} describes a small, self-contained task that a new open "
+    "source contributor could tackle without deep knowledge of the codebase"
+)
+
+# Step 2: Optimize — pass optimizers of choice and training dataset here
+optimized = pipeline.optimize(...)
+
+# Step 3: Execute the optimized pipeline on our dataset
+res = optimized.execute(df)</code></pre>
+
+      <p>LOTUS’ LazyFrame API also provides several utilities. You can always use <code>.print_tree()</code> to inspect the AST that LOTUS built under the hood. The <code>.save()</code> and <code>.load()</code> utilities make it easy to save the optimized state for your LOTUS program, then load it back in future sessions.</p>
+
+<pre><code class="language-python"># Inspect the execution plan
+optimized.print_tree()
+
+# Save the optimized LOTUS pipeline
+optimized.save("optimized_lf.pkl")
+
+# Load the pipeline during a later session
+pipeline.load("optimized_lf.pkl")</code></pre>
+
+      <h2 id="exciting-results">Exciting results</h2>
+
+      <h3 id="agent-trace-analysis">1. Agent trace analysis</h3>
+      <p>Agent traces are an absolute gold mine for understanding systematic failure modes of the system that allow us to continually iterate and improve the agent. Unfortunately, manual analysis of agent traces is slow and painstaking, creating a critical bottleneck in development cycles.</p>
+      <p>We’re excited to find that using LOTUSPlan we automate this processing by optimizing a simple semantic operator program to reach near-human level coverage performance while also minimizing the cost of LLM-based inference.</p>
+      <aside class="key-results" aria-label="Key results">
+        <div class="key-results-inner">
+          <span class="key-results-label">Key results</span>
+          <p class="key-results-body">LOTUSPlan yields human-level coverage scores, raising accuracy performance by 4.6× while reducing inference cost by 1.4×.</p>
+        </div>
+      </aside>
+
+      <figure class="blog-figure">
+        <img src="figures/mast-3.png" width="2165" height="825" decoding="async" loading="lazy" alt="Bar charts comparing coverage and inference cost of baseline versus optimized LOTUS on the MAST agent-trace analysis task.">
+        <figcaption><strong>Agent trace analysis on MAST.</strong> Optimized LOTUS raises coverage from 21% to 97% (human-level) while reducing inference cost from $0.054 to $0.038.</figcaption>
+      </figure>
+
+      <p><strong>Task &amp; dataset:</strong> We perform our analysis using the MAST dataset, which consists of agent traces over many popular benchmark tasks, including GAIA, GSM, ProgramDev, and SWE-Bench. The MAST dataset includes hundreds of traces, along with a taxonomy of systematic failure modes developed through human annotations and analysis. We consider the task of automatically creating a systematic taxonomy of agent failure modes across 100 traces. To assess the quality of the generated failure-mode taxonomy, we compute the <em>coverage score</em>, which measures the fraction of expert-annotated failed traces that are described by at least one category within the failure taxonomy.</p>
+      <p><strong>Deep dive:</strong> With LOTUS, the entire pipeline for discovering failure modes from our agent trace dataset is two operators: <code>sem_filter</code> to find traces with failure modes, and <code>sem_agg</code> to synthesize a taxonomy across them.</p>
+      <p>The naive execution of this code with <code>gpt-4o-mini</code> gets us a meager 21% coverage score:</p>
+
+<pre><code class="language-python">failure_mode_discovery = (
+    LazyFrame()
+    .sem_filter("the agent failed in {agent_trace}")
+    .sem_agg(
+        "given each {agent_trace}, create a bullet point list of failure modes. "
+        "each failure mode should be a few words."
+    )
+)</code></pre>
+
+      <p>Fortunately, LOTUSPlan can help us significantly improve both accuracy and inference cost. We run the LOTUS optimizer below, which leverages both (a) the <code>CascadeOptimizer</code> to reduce inference cost with accuracy guarantees by learning when to route easy examples to a cheaper model (<code>gpt-4.1-nano</code> in this experiment), and (b) GEPA for prompt optimization of each semantic operator. The resulting execution now saturates accuracy, with a score of 97%, and reduces the inference cost to under $0.04.</p>
+
+<pre><code class="language-python">optimized = failure_mode_discovery.optimize(
+    [
+        GEPAOptimizer(eval_fn=calculate_coverage, objective="Optimize for coverage"),
+        CascadeOptimizer(),
+    ],
+    train_data=train_df,
+)
+result = optimized.execute(test_df)</code></pre>
+
+      <p>Let’s take a quick peek at the resulting failure mode taxonomies generated from naive execution and the optimized LOTUS code. In the figure below on the left, we see the taxonomy generated by the unoptimized code. Even though these failure modes look reasonable, they are task-specific failures tied to individual traces and fail to abstract a systematic taxonomy across all traces, which leads to the low coverage score. On the other hand, the optimized LOTUS code results in a systematic taxonomy that represents meaningful clusters that transfer across agent systems, explaining why they achieve 97% coverage vs 21%. In this analysis we optimized our program for coverage, although the LOTUS optimizer with GEPA is general to any user-defined evaluation function, making it easy to optimize any metric.</p>
+
+      <figure class="blog-figure">
+        <img src="figures/agenttrace_example.png" width="636" height="298" decoding="async" loading="lazy" alt="Side-by-side failure-mode taxonomies from naive execution versus LOTUSPlan on MAST agent traces.">
+        <figcaption><strong>Sample taxonomies on MAST.</strong> Left: naive execution produces task-specific failure labels. Right: optimized LOTUS yields systematic categories that generalize across traces (higher coverage).</figcaption>
+      </figure>
+
+      <h3 id="llm-judge-evals">2. LLM-judge evaluations</h3>
+      <p>LLM-judges are an essential part of the evaluation toolkit for a variety of complex, open-ended tasks, from question-answering, to deep research, and much more. Unfortunately, robust LLM-based evals are difficult and expensive due to the cost of high-quality model judges and prompt sensitivity, which makes reliability inherently brittle.</p>
+      <p>To bridge this gap, LOTUS is now making LLM-judge evals easier, cheaper, and more accurate than ever before with our <code>llm-evals</code> subpackage, which integrates seamlessly with LOTUSPlan.</p>
+      <aside class="key-results" aria-label="Key results">
+        <div class="key-results-inner">
+          <span class="key-results-label">Key results</span>
+          <p class="key-results-body">LOTUS optimizes LLM-based evals, demonstrating 9.5% higher accuracy and 2.5× lower cost on pairwise-judge evaluations.</p>
+        </div>
+      </aside>
+
+      <figure class="blog-figure">
+        <img src="figures/llmjudge.png" width="2165" height="1031" decoding="async" loading="lazy" alt="Pairwise LLM judge evaluation: accuracy and cost with cascade routing and GEPA prompt optimization.">
+        <figcaption>Pairwise judge evals on WebGPT-style comparisons: higher accuracy and lower cost with LOTUSPlan (GEPA + cascades).</figcaption>
+      </figure>
+
+      <p><strong>Task &amp; dataset:</strong> We consider the pairwise-judge task, where the LLM must compare two candidate responses (final answer and support quotes) for a given question, and indicate which response is preferable. We use the WebGPT Comparisons dataset, which consists of questions along with two candidate answers (<code>answer_0</code> and <code>answer_1</code>) and supporting quotes (<code>quotes_0</code> and <code>quotes_1</code>). Each question-answer pair includes human preference annotations (<code>score_0</code> and <code>score_1</code>) indicating ground truth quality.</p>
+
+      <div class="table-wrap">
+      <table class="example-table">
+        <caption>Example row illustrating the WebGPT Comparisons layout: two answers with Wikipedia-style quote objects and human preference scores (<code>score_0</code>, <code>score_1</code>).</caption>
+        <thead>
+          <tr>
+            <th scope="col">question</th>
+            <th scope="col">answer_0</th>
+            <th scope="col">quotes_0</th>
+            <th scope="col">score_0</th>
+            <th scope="col">answer_1</th>
+            <th scope="col">quotes_1</th>
+            <th scope="col">score_1</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Voiced by Harry Shearer, what <em>Simpsons</em> character was modeled after Ted Koppel?</td>
+            <td>The <em>Simpsons</em> character that was possibly based on Ted Koppel is Kent Brockman.</td>
+            <td class="mono"><code>{"title":["Kent Brockman (en.wikipedia.org)"],"extract":["Kent Brockman is a fictional…"]}</code></td>
+            <td class="num">1</td>
+            <td>Apu Nahasapeemapetilon is a recurring character in <em>The Simpsons</em>…</td>
+            <td class="mono"><code>{"title":["Apu Nahasapeemapetilon (en.wikipedia.org)"],"extract":["Apu Nahasapeemapetilon…"]}</code></td>
+            <td class="num">−1</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+
+      <p><strong>How it works:</strong> LOTUSPlan significantly improved both accuracy and inference cost. The <code>CascadeOptimizer</code> helps with cost reduction, allowing us to route 85% of calls to the proxy model (<code>gpt-4.1-mini</code>)—driving the 5.3× cost reduction from $0.224 to $0.042, while providing accuracy guarantees that prevent performance degradation. Here is the code for the LOTUSPlan query:</p>
+
+<pre><code class="language-python">pairwise_judge = (
+    LazyFrame()
+    .pairwise_judge(
+        col1="answer_0",
+        col2="answer_1",
+        judge_instruction=(
+            "For the given {question}, which answer is better: {answer_0} supported by {quotes_0} "
+            "or {answer_1} supported by {quotes_1}?"
+        ),
+    )
+)
+
+def calculate_accuracy(output_df):
+    return (output_df["_judge_0"] == output_df["true_score"]).mean()
+
+optimized = pairwise_judge.optimize(
+    [
+        GEPAOptimizer(eval_fn=calculate_accuracy, objective="Maximize the accuracy"),
+        CascadeOptimizer(),
+    ],
+    train_data=train_df,
+)
+result = optimized.execute(test_df)</code></pre>
+      <p>In addition to the CascadeOptimizer for cost reduction, GEPA improves <em>accuracy</em> via prompt optimization—the user program provided a simple, high-level langex to specify the pairwise judge, and using GEPA, LOTUSPlan performs data-driven optimization to enhance the prompt into a structured, priority-ordered rubric, shown below. That structured rubric gives the LLM a systematic framework to analyze each response pair, leading to consistent and aligned judgments.</p>
+
+      <figure class="blog-figure">
+        <img src="figures/llmjudge_prompt.png" width="1461" height="621" decoding="async" loading="lazy" alt="GEPA-generated pairwise judge prompt expanded into a structured, priority-ordered rubric with evaluation criteria and few-shot examples.">
+        <figcaption><strong>GEPA-optimized judge prompt.</strong> Starting from a one-line langex, GEPA evolves a structured, priority-ordered rubric—giving the LLM a systematic framework for consistent, human-aligned judgments.</figcaption>
+      </figure>
+
+      <h3 id="rag">3. RAG</h3>
+      <p>LOTUS supports a wide range of data-intensive AI workloads. Among these, Retrieval-Augmented Generation (RAG) is one of the simplest and most elegant applications, and it remains a central paradigm for question answering over large knowledge corpora. Notably, semantic operators generalize RAG, providing a superset of data transformation, including both embedding- and LLM-based operations, for rich data programs that are more expressive and powerful. Nevertheless, here we demonstrate that even for relatively simple RAG pipelines, LOTUSPlan provides a powerful optimizer for higher accuracy RAG!</p>
+
+      <h4 id="rag-is-simple">RAG is Simple With LOTUS</h4>
+      <p>LOTUS makes it super easy to build RAG pipelines with any data. As we see in the example program below, RAG is a simple two-operator pipeline consisting of <code>search()</code> followed by a semantic aggregation to answer the query using the retrieved data. Here, we perform <code>web_search</code>, but LOTUS also supports a wide variety of search functionality, including embedding-based similarity search performed <a href="https://lotus-ai.readthedocs.io/en/latest/sem_index.html">locally</a> or using a <a href="https://lotus-ai.readthedocs.io/en/latest/vector_store.html">vector database</a>, as well as connectors to many <a href="https://lotus-ai.readthedocs.io/en/latest/web_search.html#">web search engines</a>.</p>
+
+<pre><code class="language-python">from lotus import web_search, WebSearchCorpus
+
+query = "Does metformin reduce cancer risk in diabetic patients?"
+
+# Search PubMed for relevant papers
+evidence_df = web_search(corpus=WebSearchCorpus.PUBMED, query=query, K=10)
+
+# Synthesize an answer from the retrieved evidence
+answer = evidence_df.sem_agg(
+    f"Based on the research evidence in {{abstract}}, answer the query: {query}."
+)</code></pre>
+
+      <p><strong>Now Let’s Measure RAG Performance With LOTUS…</strong></p>
+
+      <figure class="blog-figure">
+        <img src="figures/rag.png" width="2165" height="825" decoding="async" loading="lazy" alt="PubMedQA RAG pipeline: decision accuracy with naive prompts versus GEPA-optimized LOTUS pipeline at similar cost.">
+        <figcaption>PubMedQA RAG with query decomposition and evidence synthesis: joint prompt optimization improves decision accuracy without increasing pipeline cost.</figcaption>
+      </figure>
+
+      <aside class="key-results" aria-label="Key results">
+        <div class="key-results-inner">
+          <span class="key-results-label">Key results</span>
+          <p class="key-results-body">The optimized LOTUS pipeline leads to 50% higher decision accuracy without increasing pipeline cost.</p>
+        </div>
+      </aside>
+      <p><strong>Task &amp; dataset:</strong> We use the PubMedQA benchmark for biomedical question answering. PubMedQA contains clinical questions with yes/no/maybe answers, ids for relevant PubMed articles, context, and long-form answers.</p>
+
+      <div class="table-wrap">
+      <table class="example-table">
+        <caption>Example PubMedQA record (context JSON and long answer shortened for display).</caption>
+        <thead>
+          <tr>
+            <th scope="col">question</th>
+            <th scope="col">pubid</th>
+            <th scope="col">context</th>
+            <th scope="col">long_answer</th>
+            <th scope="col">decision</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Do mitochondria play a role in remodelling lace plant leaves during programmed cell death?</td>
+            <td class="num">21645374</td>
+            <td class="mono"><code>{"contexts":["Programmed cell death (PCD) is the regulated death of cells within an organism. The lace plant…","…"]}</code></td>
+            <td>Results depicted mitochondrial dynamics <em>in vivo</em> as PCD progresses within the lace plant, and…</td>
+            <td class="num">yes</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+
+      <p>Here our LOTUS pipeline adds a <code>sem_map()</code> to perform query re-writing and decomposition before issuing search queries to the <code>web_search</code> engine and performing a final semantic aggregation. Here’s the new LOTUS pseudocode, which uses <code>gpt-4.1-mini</code> in our experiments:</p>
+
+<pre><code class="language-python">pipeline = (
+    LazyFrame()
+    # Step 1: Decompose the input question into 2–4 focused search subqueries
+    .sem_map("Decompose {question} into search subqueries")
+    # Step 2: Retrieve papers from PubMed for each subquery
+    .map(lambda x: web_search(x, corpus=WebSearchCorpus.PUBMED))
+    # Step 3: Synthesize evidence into a yes/no answer
+    .sem_agg(
+        "Given {evidence}, answer {question} with yes/no decision",
+        group_by=["question"],
+    )
+)
+
+optimized = pipeline.optimize(
+    [GEPAOptimizer(eval_fn=eval_fn, objective="Maximize answer accuracy on PubMedQA")],
+    train_data=train_df,
+)
+result = optimized.execute(test_df)</code></pre>
+
+      <p><strong>How it works:</strong> We see from the results that the LOTUS LazyFrame optimization truly shines. Using GEPA during optimization, we tune every prompt in the pipeline jointly — subquery decomposition, evidence synthesis, and final decision all evolve together. These compounding gains are impossible by tuning one prompt at a time, but emerge naturally when the optimizer sees the full pipeline as a single unit.</p>
+
+      <h3 id="sneak-peek">4. Sneak peek: DeepResearch Agents and Document Extraction with LOTUS</h3>
+      <p>Two application areas we’re particularly excited about are DeepResearch Agents and complex document extraction tasks. We’re excited to see promising early results using LOTUS on these tasks as well as exciting use cases from users. Here’s a quick peek at how to get started, and if you’re working on these areas, feel free to join our <a href="https://discord.gg/ZWQBurm5bt">discord</a> for help and discussion (you can send a dm to <code>@semantic_operators</code>).</p>
+
+      <h4 id="deepresearch-agents">4a. DeepResearch Agents: Semantic Operators are Powerful Primitives for Agents</h4>
+      <p>We recently open-sourced <strong>DeepScholar-base, a reference pipeline for generative research synthesis, built on LOTUS</strong>. We measure its performance on DeepScholar-bench, finding that our reference pipeline with LOTUS achieves competitive performance with OpenAI’s DeepResearch, while running ~2x faster! Notably, DeepScholar-base nearly saturates verifiability metrics, reflecting its ability to generate well-cited reports, a key capability of DeepResearch. DeepScholar-base excels at this capability by using semantic operators for effective context-engineering and document synthesis. <strong>Conceptually, semantic operators represent a strict superset of RAG, providing a richer set of primitives for advanced parallel and recursive processing, going beyond simple <code>search()</code> and <code>LM()</code> invocations.</strong></p>
+      <p>Overall, DeepScholar-bench still remains far from saturated, highlighting the difficulty of research synthesis over large bodies of literature. For folks building DeepResearch agents, this is great news! There’s a huge design space for building agents that leverage semantic operators for performing higher quality research synthesis!</p>
+      <p>If you’re as excited about DeepResearch Agents as we are, check out these references for further reading &amp; exploration:</p>
+      <ul>
+        <li>Try out DeepScholar-base, which we’ve open-sourced here: <a href="https://github.com/guestrin-lab/deepscholar">https://github.com/guestrin-lab/deepscholar</a></li>
+        <li>Run your own research queries on the live <a href="https://deep-scholar.vercel.app/">DeepScholar Research Preview</a></li>
+        <li>Check out our paper preprint analyzing performance of existing DeepResearch systems on DeepScholar-Bench: <a href="https://arxiv.org/abs/2508.20033">https://arxiv.org/abs/2508.20033</a></li>
+      </ul>
+
+      <figure class="blog-figure">
+        <img src="figures/deepscholarbase-res.png" width="1984" height="718" decoding="async" loading="lazy" alt="DeepScholar-base benchmark results on DeepScholar-Bench compared to reference DeepResearch systems.">
+        <figcaption>DeepScholar-base (LOTUS) on DeepScholar-Bench: competitive quality with faster runtime and strong citation / verifiability behavior.</figcaption>
+      </figure>
+
+      <h4 id="document-extraction">4b. Document Extraction: From Unstructured to Structured Datasets</h4>
+      <p>Rather than synthesizing a natural-language summary over large text datasets—as in DeepResearch—, oftentimes, <strong>users instead need to produce structured views from a large, messy text dataset.</strong> While performing this document extraction task can quickly get complicated, LOTUS makes it easier than ever using LLM-powered data processing! Below, we show a quick example using LOTUS to process ArXiv papers and create a table summarizing key attributes of each paper, like the paper’s titles, its core ideas, as well as datasets and baselines used in the paper’s evaluation.</p>
+      <p>We begin by loading several ArXiv papers to a DataFrame, using LOTUS’ <code>web_extract</code> utility, which reads any paper or webpage into a DataFrame. We then build the LOTUS pipeline, using the <code>sem_extract</code> operator to perform LLM-based extraction over the dataset. The <code>sem_extract</code> operator takes a parameter for the input columns (<code>input_cols</code>) to feed as context and the output columns we would like to generate (output columns). That’s it! We can now run this single-operator pipeline with LOTUSPlan (as in the example below) or in eager mode. <strong>Since LOTUS produces standard Pandas DataFrames, it integrates seamlessly into existing data analysis workflows</strong>–you can run semantic operators with LOTUS then perform more structured analysis on the extracted dataset using your favorite data analysis library of choice (e.g., Pandas, Numpy, Seaborn, Matplotlib, etc)!</p>
+
+<pre><code class="language-python">from lotus import web_extract, WebSearchCorpus
+
+papers_df = web_extract(WebSearchCorpus.ARXIV, doc_id=["2407.11418", "2309.06180", "2404.06654"])
+
+pipeline = (
+    LazyFrame()
+    .sem_extract(
+        input_cols=["full_text"],
+        output_cols={
+            "title": "Title of the paper",
+            "core_idea": "short summary of the paper's main contribution",
+            "task_domain": "the primary task domain (e.g., NLP, fine-tuning)",
+            "datasets": "list of datasets used for evaluation",
+            "baselines": "list of baseline methods compared against",
+        },
+    )
+)
+result = pipeline.execute(papers_df)</code></pre>
+
+      <p>Here’s a quick peek at the extracted dataset returned as a DataFrame in <code>result</code>.</p>
+
+      <div class="table-wrap">
+      <table class="example-table" style="min-width: 1120px;">
+        <!-- <caption>Example <code>sem_extract</code> output joined with document metadata (illustrative summaries).</caption> -->
+        <colgroup>
+          <col style="width: 6rem;">
+          <col style="width: 9rem;">
+          <col style="width: 13rem;">
+          <col style="width: 16rem;">
+          <col style="width: 9rem;">
+          <col style="width: 10rem;">
+          <col style="width: 11rem;">
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col">id</th>
+            <th scope="col">url</th>
+            <th scope="col">title</th>
+            <th scope="col">core_idea</th>
+            <th scope="col">task_domain</th>
+            <th scope="col">datasets</th>
+            <th scope="col">baselines</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="num">2407.11418</td>
+            <td><a href="https://arxiv.org/abs/2407.11418">arxiv.org/abs/2407.11418</a></td>
+            <td>Semantic Operators: A Declarative Model for Rich, AI-based Analytics Over Text Data</td>
+            <td>Introduces semantic operators and LOTUS for declarative LLM-powered analytics over unstructured text.</td>
+            <td>Bulk semantic processing </td>
+            <td>FEVER, BioDEX, ArXiv</td>
+            <td>FacTool, AI UDF, UQE, DocETL</td>
+          </tr>
+          <tr>
+            <td class="num">2309.06180</td>
+            <td><a href="https://arxiv.org/abs/2309.06180">arxiv.org/abs/2309.06180</a></td>
+            <td>Efficient Memory Management for Large Language Model Serving with PagedAttention</td>
+            <td>PagedAttention is proposed to manage KV cache...</td>
+            <td>LLM serving </td>
+            <td>ShareGPT, Alpaca </td>
+            <td>FasterTransformer, Orca ...</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h2 id="get-started">Get started with LOTUS</h2>
+      <p>Install LOTUS with the following command and check out our <a href="https://lotus-ai.readthedocs.io/en/latest/installation.html">installation docs</a>.</p>
+
+<pre><code class="language-bash">uv add lotus-ai</code></pre>
+
+      <p>You can get started with LOTUS for LLM-based data processing in a few quick steps. 
+        LOTUS allows you to configure your LLM to whichever model you prefer and directly run your programs over pandas dataframes.
+         Here’s a quickstart example to get you started. For more examples, check out the LOTUS <a href="https://github.com/lotus-data/lotus/tree/main?tab=readme-ov-file#tutorials">tutorials</a> or <a href="https://github.com/lotus-data/lotus/tree/main/examples">code examples</a>.
+      </p>
+<pre><code class="language-python">import pandas as pd
+import lotus
+from lotus.models import LM
+
+lm = LM(model="gpt-4.1-nano")
+lotus.settings.configure(lm=lm)
+
+issues = pd.DataFrame({
+    "issue_title": [
+        "Fix typo in README",
+        "Add dark mode support to dashboard",
+        # ...
+    ]
+})
+
+good_first_issues = issues.sem_filter(
+    "The {issue_title} describes a small, self-contained task that a new open "
+    "source contributor could tackle without deep knowledge of the codebase"
+)
+print("Good first issues for new contributors:\n")
+print(good_first_issues.to_string(index=False))</code></pre>
+
+      <h2 id="references">References and further reading</h2>
+      <ul>
+        <li>🌟 <a href="https://github.com/lotus-data/lotus">LOTUS Repo</a> - this is the official repo, and we've also released benchmarks here so folks can build on them</li>
+        <li>👀 Follow for Updates on <a href="https://x.com/lianapatel_">X</a></li>
+        <li>📄 For further reading, check out our paper introducing <a href="https://arxiv.org/pdf/2407.11418">semantic operators & their optimization</a></li>
+        <li>Join Our <a href="https://discord.gg/ZWQBurm5bt">Discord Community</a> to get help, share ideas, and discuss questions</li>
+      </ul>
+      <p>If you’re building with LOTUS and want your project featured on our page or in future blogs, please send a message to <code>@semantic_operators</code> on our Discord and share what you’re working on. We’re excited to hear from you.</p>
+    </article>
+  </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      function copyFallback(text) {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand('copy');
+        } finally {
+          document.body.removeChild(ta);
+        }
+      }
+
+      document.querySelectorAll('.blog-article pre').forEach(function (pre) {
+        if (pre.closest('.code-block-wrap')) return;
+        var wrap = document.createElement('div');
+        wrap.className = 'code-block-wrap';
+        pre.parentNode.insertBefore(wrap, pre);
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'code-copy-btn';
+        btn.setAttribute('aria-label', 'Copy code to clipboard');
+        btn.textContent = 'Copy';
+        btn.addEventListener('click', function () {
+          var code = pre.querySelector('code');
+          var text = code ? code.textContent : pre.textContent;
+          var reset = function () {
+            btn.textContent = 'Copy';
+            btn.classList.remove('copied');
+            btn.removeAttribute('aria-live');
+          };
+          var ok = function () {
+            btn.textContent = 'Copied!';
+            btn.classList.add('copied');
+            btn.setAttribute('aria-live', 'polite');
+            window.setTimeout(reset, 2000);
+          };
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(ok).catch(function () {
+              try {
+                copyFallback(text);
+                ok();
+              } catch (e) {
+                btn.textContent = 'Failed';
+                window.setTimeout(reset, 2000);
+              }
+            });
+          } else {
+            try {
+              copyFallback(text);
+              ok();
+            } catch (e) {
+              btn.textContent = 'Failed';
+              window.setTimeout(reset, 2000);
+            }
+          }
+        });
+        wrap.appendChild(btn);
+        wrap.appendChild(pre);
+      });
+    })();
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-clike.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
+  <script>
+    if (typeof Prism !== 'undefined') Prism.highlightAll();
+  </script>
+</body>
+</html>
