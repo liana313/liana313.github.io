@@ -405,8 +405,10 @@
 
       <p>We’re excited to share our release of <strong>LOTUSPlan</strong>, LOTUS’ new API for optimized LLM-based data processing via lazy execution of semantic operator programs.</p>
       <p>Over a year ago LOTUS introduced <em>semantic operators</em>, a declarative programming model for LLM-based data programming. <strong>LOTUSPlan represents the next evolution of the LOTUS API</strong>
-        toward making LLM-based data processing easier, cheaper, and more accurate. LOTUS now builds a global plan of your LLM queries and leverages its suite of optimizers (which now includes your favorite text optimizers like DSPy's <a href="https://gepa-ai.github.io/gepa/">GEPA</a>) to achieve state-of-the-art performance.</p>
-      <p><strong>The results: over 2.4× cost reduction and 4.6× higher accuracy</strong> for LLM-based processing across diverse tasks, like agent trace analysis, LLM-judge evals and RAG.</p>
+        toward making LLM-based data processing easier, cheaper, and more accurate. 
+        LOTUSPlan brings <strong>global planning and lazy execution</strong> for your LLM queries, leveraging our suite of optimizers (which now includes your favorite text optimizers like DSPy's <a href="https://gepa-ai.github.io/gepa/">GEPA</a>) to achieve state-of-the-art performance.
+        The LOTUS API lets you seamlessly switch between eager execution (great for fast development and debugging) and lazy execution (for significantly optimized performance), giving you the best of both worlds.</p>        
+      <p><strong>The results: up to 2.4× cost reduction and up to 4.6× higher accuracy</strong> for LLM-based processing across diverse tasks, like agent trace analysis, LLM-judge evals and RAG.</p>
 
       <figure class="blog-figure">
         <img src="figures/hero_summary.png" width="2165" height="878" decoding="async" loading="eager" alt="Summary charts: LOTUSPlan improves accuracy and reduces cost across semantic operator workloads compared to unoptimized baselines.">
@@ -427,7 +429,7 @@
 
       <h2 id="background">Background: Why LLM-Based Data Processing Needs New Primitives</h2>
       <p>Over the past few years, we have been seeing a new set of workloads, which require our AI systems to scale over increasingly massive datasets. Whether it’s a DeepResearch agent synthesizing hundreds of papers, a large scale LLM-Judge evaluation, or complex document extraction, these workloads—which we call <em>semantic bulk processing</em>—share a common challenge: they require processing large amounts of data, often in complex parallel or recursive patterns.</p>
-      <p>Over a year ago, our research introduced <a href="https://www.vldb.org/pvldb/vol18/p4171-patel.pdf">semantic operators</a> to serve these tasks. Semantic operators are declarative primitives of LLM-based data processing—each operator implements a transformation over unstructured datasets and can be optimized with accuracy guarantees. Conceptually, we view semantic operators through two complementary lenses:</p>
+      <p>Over a year ago, our research introduced <a href="https://www.vldb.org/pvldb/vol18/p4171-patel.pdf">semantic operators</a> to serve these tasks. Semantic operators are declarative primitives for LLM-based data processing (e.g., LLM-based semantic filtering, mapping, aggregations and joins)—each operator implements a transformation over unstructured datasets and can be optimized with accuracy guarantees. Conceptually, we view semantic operators through two complementary lenses:</p>
       <ul>
         <li><strong>The evolution of relational operators for AI-powered data processing:</strong> akin to how relational operators in SQL transformed structured data processing by decoupling application logic from the systems
            underlying storage and execution, semantic operators are the analog for declarative LLM-based data programming.
@@ -504,6 +506,38 @@ good_first_issues = issues.sem_filter(
       </ol>
       <p>The new LOTUS LazyFrame module allows you to chain arbitrary semantic operators and pandas operators together, before calling <code>.optimize()</code> and <code>.execute()</code>. Under the hood, LOTUS constructs the AST as soon as you declare your LOTUS pipeline. The AST defines the logical plan for your LLM program, where each semantic operator is represented by a single node, specified by an LLM and natural language prompt used for that operator’s execution.</p>
       <p>When you call <code>.optimize()</code> over your program, LOTUS can rewrite the AST logic—for example reordering operators, performing prompt optimization, or substituting expensive model calls for cheaper ones using model cascades.</p>
+
+      <figure class="blog-figure">
+        <svg viewBox="0 0 640 330" width="100%" height="auto" role="img"
+             aria-label="LOTUSPlan architecture: a semantic operator program is parsed into an abstract syntax tree, rewritten by accuracy- and cost-based optimizers, then run by the execution engine which invokes LLMs and embedding models."
+             style="display:block;background:#fff;font-family:'Lato',Verdana,Helvetica,sans-serif;">
+          <defs>
+            <marker id="arrowhead" markerWidth="9" markerHeight="9" refX="5.5" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6 Z" fill="#9aa0a6"></path>
+            </marker>
+          </defs>
+          <!-- input -->
+          <rect x="70" y="14" width="500" height="56" rx="8" fill="#ffffff" stroke="#cfd2d8" stroke-width="1.5"></rect>
+          <text x="320" y="37" text-anchor="middle" font-size="14" font-weight="700" fill="#1a1a1c">Semantic operator program</text>
+          <text x="320" y="55" text-anchor="middle" font-size="11" fill="#6b6f76">e.g., sem_filter, sem_map, sem_agg, sem_join, …</text>
+          <line x1="320" y1="70" x2="320" y2="93" stroke="#9aa0a6" stroke-width="1.5" marker-end="url(#arrowhead)"></line>
+          <!-- parser -->
+          <rect x="70" y="96" width="500" height="56" rx="8" fill="#eef4fb" stroke="#b9d2ee" stroke-width="1.5"></rect>
+          <text x="320" y="119" text-anchor="middle" font-size="14" font-weight="700" fill="#15467e">Parser</text>
+          <text x="320" y="137" text-anchor="middle" font-size="11" fill="#5a7596">logical plan constructed as an abstract syntax tree (one node per operator)</text>
+          <line x1="320" y1="152" x2="320" y2="175" stroke="#9aa0a6" stroke-width="1.5" marker-end="url(#arrowhead)"></line>
+          <!-- optimizer (highlight) -->
+          <rect x="70" y="178" width="500" height="56" rx="8" fill="#fffaf3" stroke="#f09228" stroke-width="2"></rect>
+          <text x="320" y="201" text-anchor="middle" font-size="14" font-weight="700" fill="#9a5b0a">Optimizer <tspan font-weight="400">(.optimize())</tspan></text>
+          <text x="320" y="219" text-anchor="middle" font-size="11" fill="#9a5b0a">accuracy- and cost-based optimizers (e.g., model cascades, GEPA, operator reordering)</text>
+          <line x1="320" y1="234" x2="320" y2="257" stroke="#9aa0a6" stroke-width="1.5" marker-end="url(#arrowhead)"></line>
+          <!-- execution -->
+          <rect x="70" y="260" width="500" height="56" rx="8" fill="#eef4fb" stroke="#b9d2ee" stroke-width="1.5"></rect>
+          <text x="320" y="283" text-anchor="middle" font-size="14" font-weight="700" fill="#15467e">Execution Engine</text>
+          <text x="320" y="301" text-anchor="middle" font-size="11" fill="#5a7596">runs the optimized plan and invokes LLMs, embedding models, etc.</text>
+        </svg>
+        <figcaption><strong>The LOTUSPlan pipeline.</strong> A semantic operator program is parsed into an AST (a logical plan with one node per operator), globally rewritten by the optimizers via <code>.optimize()</code>, and then run by the execution engine—dispatching each operator to the appropriate LLMs and embedding models.</figcaption>
+      </figure>
       <p>We’ve designed LOTUS to modularly support custom optimizers, so that as new ones become available, we can seamlessly support them (let us know what optimizers you’d like us to support next!). In addition to always-on optimizers (e.g., operator reordering), LOTUS currently supports two key custom optimizers:</p>
       <ul>
         <li><strong>GEPA optimizer:</strong> GEPA is a state-of-the-art prompt optimizer, which allows you to specify a small labeled dataset and rewrites all prompt instructions to optimize your accuracy metric. LOTUS allows you to leverage GEPA for optimizing any semantic operator.</li>
@@ -760,7 +794,7 @@ result = optimized.execute(test_df)</code></pre>
 
       <figure class="blog-figure">
         <img src="figures/deepscholarbase-res.png" width="1984" height="718" decoding="async" loading="lazy" alt="DeepScholar-base benchmark results on DeepScholar-Bench compared to reference DeepResearch systems.">
-        <figcaption>DeepScholar-base (LOTUS) on DeepScholar-Bench: competitive quality with faster runtime and strong citation / verifiability behavior.</figcaption>
+        <figcaption><strong>DeepScholar-base (LOTUS) on DeepScholar-Bench.</strong> Bars are grouped into three evaluation dimensions, each measured by its own metrics: <em>knowledge synthesis</em> (organization, factual coverage), <em>retrieval quality</em> (relevance rate, reference coverage, document importance), and <em>verifiability</em> (citation precision, claim coverage). All metrics are normalized to a 0–1 scale, where 1 is best. DeepScholar-base reaches competitive quality with reference DeepResearch systems while running ~2× faster, and nearly saturates verifiability.</figcaption>
       </figure>
 
       <h4 id="document-extraction">4b. Document Extraction: From Unstructured to Structured Datasets</h4>
